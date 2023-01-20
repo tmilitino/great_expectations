@@ -30,7 +30,7 @@ from great_expectations.exceptions import (
     GreatExpectationsError,
     ValidationError,
 )
-from great_expectations.exceptions import exceptions as ge_exceptions
+from great_expectations.exceptions import exceptions as gx_exceptions
 from great_expectations.execution_engine import ExecutionEngine
 from great_expectations.execution_engine.execution_engine import (
     MetricComputationConfiguration,
@@ -260,7 +260,7 @@ class SparkDFExecutionEngine(ExecutionEngine):
             # batch_data != None is already checked when RuntimeDataBatchSpec is instantiated
             batch_data = batch_spec.batch_data
             if isinstance(batch_data, str):
-                raise ge_exceptions.ExecutionEngineError(
+                raise gx_exceptions.ExecutionEngineError(
                     f"""SparkDFExecutionEngine has been passed a string type batch_data, "{batch_data}", which is \
 illegal.  Please check your config."""
                 )
@@ -310,7 +310,7 @@ illegal.  Please check your config."""
 
             # this can happen if we have not converted schema into json at Datasource-config level
             elif isinstance(schema, str):
-                raise ge_exceptions.ExecutionEngineError(
+                raise gx_exceptions.ExecutionEngineError(
                     """
                                 Spark schema was not properly serialized.
                                 Please run the .jsonValue() method on the schema object before loading into GX.
@@ -382,7 +382,7 @@ illegal.  Please check your config."""
 
     # TODO: <Alex>Similar to Abe's note in PandasExecutionEngine: Any reason this shouldn't be a private method?</Alex>
     @staticmethod
-    def guess_reader_method_from_path(path):
+    def guess_reader_method_from_path(path: str):
         """
         Based on a given filepath, decides a reader method. Currently supports tsv, csv, and parquet. If none of these
         file extensions are used, returns ExecutionEngineError stating that it is unable to determine the current path.
@@ -394,6 +394,7 @@ illegal.  Please check your config."""
             A dictionary entry of format {'reader_method': reader_method}
 
         """
+        path = path.lower()
         if path.endswith(".csv") or path.endswith(".tsv"):
             return "csv"
         elif (
